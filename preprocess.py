@@ -34,29 +34,32 @@ def transform(filename):
                                    '$75,000 - $100,000':4,
                                    '$100,001 - $150,000':5,
                                    'over $150,000':6})
-  df['HouseholdStatus'] = df['HouseholdStatus'].map({'Domestic Partners (no kids)':1,
-                                                     'Domestic Partners (w/kids)':2,
-                                                     'Married (no kids)':3,
-                                                     'Married (w/kids)':4,
-                                                     'Single (no kids)':5,
-                                                     'Single (w/kids)':6})
+  df['HouseholdStatus'] = df['HouseholdStatus'].map({'Single (no kids)':1,
+                                                     'Single (w/kids)':2,
+                                                     'Domestic Partners (no kids)':3,
+                                                     'Domestic Partners (w/kids)':4,
+                                                     'Married (no kids)':5,
+                                                     'Married (w/kids)':6})
   df['EducationLevel'] = df['EducationLevel'].map({'Current K-12':1,
                                                    'High School Diploma':2,
-                                                   'Current Undergraduate':3,
-                                                   "Associate's Degree":4,
+                                                   "Associate's Degree":3,
+                                                   'Current Undergraduate':4,
                                                    "Bachelor's Degree":5,
                                                    "Master's Degree":6,
                                                    'Doctoral Degree':7})
   df['Party'] = df['Party'].map({'Democrat':1,
-                                 'Republican':2,
-                                 'Independent':3,
+                                 'Independent':2,
+                                 'Other':3,
                                  'Libertarian':4,
-                                 'Other':5})
-  df = df.apply(pd.to_numeric, errors='ignore')
+                                 'Republican':5})
+  # df['Age'] = 2014 - df['YOB']
+  # df = df.replace({False:-1, True:1})
+  # df = df.apply(pd.to_numeric, errors='ignore')
 
-  data = df.drop('Happy', 1).as_matrix()
-  target = df['Happy'].as_matrix()
+  data = df.drop('Happy', 1)
+  target = df['Happy']
   return {'data':data,'target':target}
+
 
 def fill_missing(X, strategy, isClassified):
   """
