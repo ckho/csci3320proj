@@ -3,11 +3,14 @@ from preprocess import transform
 import numpy as np
 import pandas as pd
 from naive_bayes import NaiveBayes
-
+from lr import LogisticRegression
 
 from sklearn.feature_extraction import DictVectorizer as DV
 from sklearn import svm
+from sklearn import ensemble
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression as lr2
+from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 
 def main():
   # load training data
@@ -59,30 +62,39 @@ def main():
   # X_train = np.dot(X_train, a)
   # X_verify = np.dot(X_verify, a)
 
+  # ### use the logistic regression
+  print('Train the logistic regression classifier')
+  lr_model = LogisticRegression()
+  lr_model.fit(X_train, y_train)
+  print(lr_model.score(X_verify, y_verify))
+
+  print('Train the logistic regression classifier-sklearn')
+  lr_model = lr2()
+  lr_model.fit(X_train, y_train)
+  print(lr_model.score(X_verify, y_verify))
+
+  # # ### use the naive bayes
+  print('Train the naive bayes classifier')
+  nb_model = NaiveBayes(model='gaussian')
+  nb_model.fit(X_train, y_train)
+  print(nb_model.score(X_verify, y_verify))
+
+  print('Train the naive bayes classifier-sklearn')
+  nb_model = GaussianNB()
+  nb_model.fit(X_train, y_train)
+  print(nb_model.score(X_verify, y_verify))
+
+  ## use the svm
+  print('Train the SVM classifier')
   svm_model = svm.SVC(random_state=1, C=0.19, gamma=0.0028, shrinking=True, probability=True)
   svm_model.fit(X_train, y_train)
-  print(svm_model.score(X_train, y_train))
   print(svm_model.score(X_verify, y_verify))
 
-  # print('Train the naive bayes classifier')
-  # print('Bernoulli')
-  # nb_model = NaiveBayes(model='bernoulli')
-  # nb_model.fit(X_train, y_train.values)
-  # # nb_model.printPara()
-  # print(nb_model.predict(X_verify))
-  # print('Gaussian')
-  # nb_model = NaiveBayes(model='gaussian')
-  # nb_model.fit(X_train, y_train.values)
-  # # nb_model.printPara()
-  # print(nb_model.predict(X_verify))
-  # print('Multinomial')
-  # nb_model = NaiveBayes(model='multinomial')
-  # nb_model.fit(X_train, y_train.values)
-  # # nb_model.printPara()
-  # print(nb_model.predict(X_verify))
-  # print(nb_model.predict(X_verify))
-  # print(nb_model.score(X_train, y_train.values))
-  # print(nb_model.score(X_verify, y_verify.values))
+  ## use the random forest
+  print('Train the random forest classifier')
+  rf_model = ensemble.RandomForestClassifier(random_state=1, n_estimators=4300, n_jobs=-1)
+  rf_model.fit(X_train, y_train)
+  print(rf_model.score(X_verify, y_verify))
 
 
 

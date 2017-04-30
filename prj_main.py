@@ -10,8 +10,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.feature_extraction import DictVectorizer
 
-from MICE import MICEImputer
-
 import numpy as np
 import pandas as pd
 
@@ -22,46 +20,31 @@ def main():
   X = train_dataset['data']
   y = train_dataset['target']
 
-  X = X.drop('UserID', 1)
+  X = X.replace({False:-1, True:1})
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
   X.loc[X.YOB.isnull(), 'YOB'] = 0
-  X.loc[X['Income'].isnull(), 'Income'] = 0
-  X.loc[X['HouseholdStatus'].isnull(), 'HouseholdStatus'] = 0
-  X.loc[X['EducationLevel'].isnull(), 'EducationLevel'] = 0
-  X.loc[X['Party'].isnull(), 'Party'] = 0
-
-  X = X.apply(pd.to_numeric, errors='ignore')
-
-  imput_model = MICEImputer(verbose=True, random_state=1, min_value=0, max_value=1, random_state=1)
-
-  X_filled = imput_model.fit_transform(X)
-
-  X_filled_df = pd.DataFrame(data=X_filled[:,:], columns=X.columns)
-
-  # fill in missing data (optional)
-  # X_full = fill_missing(X, 'most_frequent', False)
 
   numeric_cols = ['YOB', 'votes']
-  X_num = X_filled_df[numeric_cols].as_matrix()
 
-  # scale to <0,1>
-  max_X = np.amax(X_num, 0)
-  X_num = X_num / max_X
+  x_num = X[numeric_cols].as_matrix()
+  x_max = np.amax(x_num, 0)
+  x_num = x_num / x_max
 
-  cat_X = X_filled_df.drop(numeric_cols, axis = 1 )
-  X_cat_X = cat_X.T.to_dict().values()
+  cat_X = X.drop(numeric_cols + ['UserID'], axis = 1)
+  cat_X.fillna(0, inplace = True)
+  x_cat = cat_X.T.to_dict().values()
 
-  # ### vectorize
-  vectorizer = DictVectorizer(sparse = False)
-  vec_X_cat = vectorizer.fit_transform(X_cat_X)
+  # vectorize
+  vectorizer = DV(sparse = False)
+  vec_x_cat = vectorizer.fit_transform(x_cat)
+
+  # combine x
+  x_completed = np.hstack((x_num, vec_x_cat))
 
 
-  X_combined = np.hstack((X_num, vec_X_cat))
-
-  # ### cross-validation
-  X_train, X_verify, y_train, y_verify = train_test_split(X_combined, y, test_size=0.2, random_state=0)
+  X_train, X_verify, y_train, y_verify = train_test_split(x_completed, y, test_size=0.18, random_state=0)
 
   # ### use the logistic regression
   print('Train the logistic regression classifier')
@@ -69,28 +52,31 @@ def main():
   lr_model.fit(X_train, y_train)
   print(lr_model.score(X_verify, y_verify))
 
+  print('Train the logistic regression classifier-sklearn')
+  lr_model = lr2()
+  lr_model.fit(X_train, y_train)
+  print(lr_model.score(X_verify, y_verify))
 
-  # ### use the naive bayes
+  # # ### use the naive bayes
   print('Train the naive bayes classifier')
-  nb_model = NaiveBayes()
+  nb_model = NaiveBayes(model='gaussian')
   nb_model.fit(X_train, y_train)
   print(nb_model.score(X_verify, y_verify))
 
-  # ## use the svm
-  print('Train the SVM classifier')
-  svm_model = svm.SVC(random_state=1, shrinking=True, probability=True)
-  C_range = np.linspace(0.001, 100, 1000)
-  gamma_range = np.linspace(0.0001, 1.000, 1000)
-  param_grid = {'C': C_range, 'gamma': gamma_range}
-  lrgs = GridSearchCV(estimator=svm_model, param_grid=param_grid, cv=6, n_jobs=-1)
-  lrgs.fit(X_train, y_train)
-  # svm_model.fit(X_train, y_train)
-  print(lrgs.score(X_verify, y_verify))
+  print('Train the naive bayes classifier-sklearn')
+  nb_model = GaussianNB()
+  nb_model.fit(X_train, y_train)
+  print(nb_model.score(X_verify, y_verify))
 
+  ## use the svm
+  print('Train the SVM classifier')
+  svm_model = svm.SVC(random_state=1, C=0.19, gamma=0.0028, shrinking=True, probability=True)
+  svm_model.fit(X_train, y_train)
+  print(svm_model.score(X_verify, y_verify))
 
   ## use the random forest
   print('Train the random forest classifier')
-  rf_model = ensemble.RandomForestClassifier(random_state=1)
+  rf_model = ensemble.RandomForestClassifier(random_state=1, n_estimators=4300, n_jobs=-1)
   rf_model.fit(X_train, y_train)
   print(rf_model.score(X_verify, y_verify))
 
