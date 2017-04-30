@@ -82,7 +82,7 @@ def main():
   C_range = np.linspace(0.001, 100, 1000)
   gamma_range = np.linspace(0.0001, 1.000, 1000)
   param_grid = {'C': C_range, 'gamma': gamma_range}
-  lrgs = GridSearchCV(estimator=nb, param_grid=dict(C=alpha_range), cv=6, n_jobs=-1)
+  lrgs = GridSearchCV(estimator=svm_model, param_grid=dict(C=alpha_range), cv=6, n_jobs=-1)
   lrgs.fit(X_train, y_train)
   # svm_model.fit(X_train, y_train)
   print(lrgs.score(X_verify, y_verify))
