@@ -48,10 +48,10 @@ def transform(filename):
                                                    "Master's Degree":6,
                                                    'Doctoral Degree':7})
   df['Party'] = df['Party'].map({'Democrat':1,
-                   'Republican':2,
-                   'Independent':3,
-                   'Libertarian':4,
-                   'Other':5})
+                                 'Republican':2,
+                                 'Independent':3,
+                                 'Libertarian':4,
+                                 'Other':5})
   df = df.apply(pd.to_numeric, errors='ignore')
 
   data = df.drop('Happy', 1).as_matrix()
