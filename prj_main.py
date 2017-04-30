@@ -148,7 +148,7 @@ def main():
   for x_test, prediction in zip(X_test.values, rf_predictions):
     print(str(int(x_test[0]))+','+str(int(prediction)), file=rf_predictions_file)
 
-
+#just testing git
 
 if __name__ == '__main__':
   main()
