@@ -16,7 +16,7 @@ def main():
   men.pie(sizes_men, labels=labels, autopct='%1.1f%%', shadow=True)
   men.axis('equal')
   # Women
-  women=fig.add_subplot(1, 2, 2)
+  women = fig.add_subplot(1, 2, 2)
   plt.title('Women')
   happycount_women = df['Happy'][df['Gender'].isin({'Female'})].value_counts()
   sizes_women = [happycount_women[1], happycount_women[0]]
