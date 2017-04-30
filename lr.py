@@ -38,3 +38,5 @@ class LogisticRegression:
     return np.where(p >= .5, 1, 0)
 
 
+  def score(self, X, y):
+    return sum(self.predict(X) == y) / len(y)
