@@ -1,4 +1,4 @@
-from preprocess import transform
+from preprocess import own_transform
 
 import numpy as np
 import pandas as pd
@@ -15,7 +15,7 @@ from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 def main():
   # load training data
   filename_train = './data/train.csv'
-  train_dataset = transform(filename_train)
+  train_dataset = own_transform(filename_train)
   X = train_dataset['data']
   y = train_dataset['target']
 
@@ -25,42 +25,26 @@ def main():
   X.loc[X.YOB > 2004, 'YOB'] = 0
   X.loc[X.YOB.isnull(), 'YOB'] = 0
 
-  # numeric x
-  numeric_cols = [ 'YOB', 'votes' ]
+  numeric_cols = ['YOB', 'votes']
+
   x_num = X[numeric_cols].as_matrix()
-
-  # scale to <0,1>
-
   x_max = np.amax(x_num, 0)
-
   x_num = x_num / x_max
 
-  # ids = .UserID
-
-  # categorical
-
   cat_X = X.drop(numeric_cols + ['UserID'], axis = 1)
-
-
   cat_X.fillna(0, inplace = True)
-
-
   x_cat = cat_X.T.to_dict().values()
 
   # vectorize
-
   vectorizer = DV(sparse = False)
   vec_x_cat = vectorizer.fit_transform(x_cat)
 
-  # complete x
-
+  # combine x
   x_completed = np.hstack((x_num, vec_x_cat))
 
 
   X_train, X_verify, y_train, y_verify = train_test_split(x_completed, y, test_size=0.18, random_state=0)
 
-  # X_train = np.dot(X_train, a)
-  # X_verify = np.dot(X_verify, a)
 
   # ### use the logistic regression
   print('Train the logistic regression classifier')
