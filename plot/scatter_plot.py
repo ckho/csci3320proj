@@ -14,7 +14,7 @@ def main():
                                    'over $150,000':175000})
 
 
-  fig = plt.figure()
+  fig = plt.figure(1, [8, 8])
   ax = plt.subplot()
   plt.title('Relationship between YOB and Income')
   ax.scatter(df1['YOB'], df1['Income'], alpha=0.01)
