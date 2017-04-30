@@ -27,7 +27,8 @@ class LogisticRegression:
     self.X = normalize(X, norm='l2')
     self.y = y
     self.theta = np.zeros(X.shape[1])
-    result = opt.fmin_l_bfgs_b(self._cost, x0=self.theta, fprime=self._gradientDescend, disp=0)
+    # result = opt.fmin_l_bfgs_b(self._cost, x0=self.theta, fprime=self._gradientDescend, disp=0)
+    result = opt.fmin_tnc(self._cost, x0=self.theta, fprime=self._gradientDescend, disp=0)
     self.theta = result[0]
     return self
 
