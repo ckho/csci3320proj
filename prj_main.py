@@ -138,7 +138,7 @@ def main():
   # for x_test, prediction in zip(x_test_completed, rf_predictions):
   #   print(str(int(x_test['UserID']))+','+str(int(prediction)), file=rf_predictions_file)
 
-
+#just testing git
 
 if __name__ == '__main__':
   main()
