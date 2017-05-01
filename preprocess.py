@@ -121,6 +121,8 @@ def transform_lg_test(filename):
   X = df
 
   X = X.replace({False:-1, True:1})
+  X_filled = fill_missing(X.values,'mean',0)
+  X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -205,11 +207,7 @@ def transform_for_lg(filename):
   X = X.replace({False:-1, True:1})
 
   X_filled = fill_missing(X.values,'mean',0)
-
   X = pd.DataFrame(data=X_filled, columns=X.columns)
-
-
-
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -259,6 +257,8 @@ def transform_for_nb_test(filename):
                    na_values=['NA'])
 
   X = X.replace({False:-1, True:1})
+  X_filled = fill_missing(X.values,'none',1)
+  X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -313,6 +313,12 @@ def transform_for_nb(filename):
 
   X = X.replace({False:-1, True:1})
 
+  X_filled = fill_missing(X.values,'none',1)
+  X = pd.DataFrame(data=X_filled, columns=X.columns)
+
+  X['YOB'] = X['YOB'].astype(float)
+  X['votes'] = X['votes'].astype(float)
+
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
   X.loc[X.YOB.isnull(), 'YOB'] = 0
@@ -323,7 +329,7 @@ def transform_for_nb(filename):
   x_max = np.amax(x_num, 0)
   x_num = x_num / x_max
 
-  x_num = (x_num * 6).round()
+  x_num = np.round(x_num * 6)
 
   cat_X = X.drop(numeric_cols + ['UserID'], axis = 1)
   cat_X.fillna(0, inplace = True)
@@ -397,6 +403,8 @@ def transform_for_svm_test(filename):
   X = df
 
   X = X.replace({False:-1, True:1})
+  X_filled = fill_missing(X.values,'none',1)
+  X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -481,6 +489,8 @@ def transform_for_svm(filename):
   y = df['Happy']
 
   X = X.replace({False:-1, True:1})
+  X_filled = fill_missing(X.values,'most_frequent',1)
+  X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -532,6 +542,8 @@ def transform_for_rf_test(filename):
                                  'Own','Dad','Pessimist'],
                    na_values=['NA'])
   X = X.replace({False:-1, True:1})
+  X_filled = fill_missing(X.values,'medium',0)
+  X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -589,6 +601,8 @@ def transform_for_rf(filename):
   y = df['Happy']
 
   X = X.replace({False:-1, True:1})
+  X_filled = fill_missing(X.values,'medium',0)
+  X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -627,8 +641,6 @@ def fill_missing(X, strategy, isClassified):
    otherwise, just take the median/mean/most_frequent values of input data to
    fill in the missing data
   """
-
-
   if not(isClassified):
     for col in range(X.shape[1]):
       replacement = 0
@@ -640,13 +652,13 @@ def fill_missing(X, strategy, isClassified):
         replacement = sp.stats.mode(X[:,col], nan_policy='omit')
 
       for row in range(X[:,col].shape[0]):
-        if X[row,col] == 'nan':
+        if np.isnan(X[row,col]):
           X[row,col] = replacement
 
   # if(isClassified):
 
 
-
+  print(X)
 
 
 
