@@ -121,7 +121,7 @@ def transform_lr_test(filename):
   X = df
 
   X = X.replace({False:-1, True:1})
-  X_filled = fill_missing(X.values,'most_frequent',0)
+  X_filled = fill_missing(X.values,'most_frequent',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -206,7 +206,7 @@ def transform_for_lr(filename):
   y = df['Happy']
   X = X.replace({False:-1, True:1})
 
-  X_filled = fill_missing(X.values,'most_frequent',0)
+  X_filled = fill_missing(X.values,'most_frequent',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
