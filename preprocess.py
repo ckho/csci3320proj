@@ -185,6 +185,15 @@ def fill_missing(X, strategy, isClassified):
    otherwise, just take the median/mean/most_frequent values of input data to
    fill in the missing data
   """
+  #
+  #strategy1: mean
 
+  # print()
+  if strategy == 'mean':
+      X.mean()
+
+
+  #strategy2: medium
+  #strategy3: mode
 
   return X_full

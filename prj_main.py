@@ -21,6 +21,10 @@ def main():
   # load training data
   filename_train = './data/train.csv'
   train_dataset = own_transform(filename_train)
+  strategy = 'mean'
+  # strategy = 'medium'
+  # strategy = 'most_frequent'
+  train_dataset = fill_missing(train_dataset,strategy,0)
   X = train_dataset['data']
   y = train_dataset['target']
 
