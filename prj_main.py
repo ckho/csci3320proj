@@ -1,4 +1,4 @@
-from preprocess import transform_for_general, transform_for_general_test
+from preprocess import transform_for_lg, transform_for_lg
 from preprocess import transform_for_svm, transform_for_svm_test
 from preprocess import transform_for_nb, transform_for_nb_test
 from preprocess import transform_for_rf, transform_for_rf_test
@@ -26,12 +26,10 @@ import time
 def main():
   # load training data
   filename_train = './data/train.csv'
-  train_dataset = transform_for_general(filename_train)
-
+  train_dataset = transform_for_lg(filename_train)
   X_train, X_verify, y_train, y_verify = train_test_split(train_dataset['data'], train_dataset['target'], test_size=0.18, random_state=0)
 
   print(X_train.shape)
-
   ## use the logistic regression
   print('Train the logistic regression classifier')
   t1 = time.time()

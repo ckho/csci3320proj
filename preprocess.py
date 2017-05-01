@@ -63,7 +63,7 @@ def transform(filename):
   return {'data':data,'target':target}
 
 
-def transform_for_general_test(filename):
+def transform_lg_test(filename):
   """ preprocess the training data"""
   """ your code here """
   df = pd.read_csv(filename,
@@ -145,7 +145,7 @@ def transform_for_general_test(filename):
   return {'data':x_completed}
 
 
-def transform_for_general(filename):
+def transform_for_lg(filename):
   """ preprocess the training data"""
   """ your code here """
   df = pd.read_csv(filename,
