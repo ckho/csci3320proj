@@ -4,6 +4,10 @@ import scipy.stats as sp
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import OneHotEncoder
 
+
+pd.set_option('chained_assignment',None)
+significant_field = ['Q118237','Q101162','Q107869','Q102289','Q98869','Q102906','Q106997','HouseholdStatus','Q108855','Q119334','Q115610','Q108856','Q120014','Q108343','Q116197','Q98197', 'Q116448','Q102687','Q114961','Q108342','Q113181','Income', 'Q117186','Party','Q115390','Q112512','Q102089','Q116953','Q115611','Q121011','Q111580','Q99716', 'Q106993','Q109367','Q114152','Q106389','Q116441','Q123621','Q113584','Q124742','Q108617','Q116881','Q117193','Q100689','Q115602','Q98578', 'Q120012','Q100680','Q112478','Q106272','Q99982', 'Q109244','Q98059', 'EducationLevel','Q96024', 'Q111848','Q119851','Q118233','Q119650','UserID','Q108950','Q102674','YOB', 'UserID']
+
 def transform(filename):
   """ preprocess the training data"""
   """ your code here """
@@ -120,13 +124,16 @@ def transform_for_general_test(filename):
 
   X = df
 
+  X = X[significant_field]
+
   X = X.replace({False:-1, True:1})
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
   X.loc[X.YOB.isnull(), 'YOB'] = 0
 
-  numeric_cols = ['YOB', 'votes']
+  numeric_cols = ['YOB']
+  # numeric_cols = ['YOB', 'votes']
 
   x_num = X[numeric_cols].as_matrix()
   x_max = np.amax(x_num, 0)
@@ -202,13 +209,16 @@ def transform_for_general(filename):
   X = df.drop('Happy', 1)
   y = df['Happy']
 
+  X = X[significant_field]
+
   X = X.replace({False:-1, True:1})
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
   X.loc[X.YOB.isnull(), 'YOB'] = 0
 
-  numeric_cols = ['YOB', 'votes']
+  numeric_cols = ['YOB']
+  # numeric_cols = ['YOB', 'votes']
 
   x_num = X[numeric_cols].as_matrix()
   x_max = np.amax(x_num, 0)
@@ -251,13 +261,16 @@ def transform_for_nb_test(filename):
                                  'Own','Dad','Pessimist'],
                    na_values=['NA'])
 
+  X = X[significant_field]
+
   X = X.replace({False:-1, True:1})
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
   X.loc[X.YOB.isnull(), 'YOB'] = 0
 
-  numeric_cols = ['YOB', 'votes']
+  numeric_cols = ['YOB']
+  # numeric_cols = ['YOB', 'votes']
 
   x_num = X[numeric_cols].as_matrix()
   x_max = np.amax(x_num, 0)
@@ -304,13 +317,17 @@ def transform_for_nb(filename):
   X = df.drop('Happy', 1)
   y = df['Happy']
 
+  X = X[significant_field]
+
+
   X = X.replace({False:-1, True:1})
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
   X.loc[X.YOB.isnull(), 'YOB'] = 0
 
-  numeric_cols = ['YOB', 'votes']
+  numeric_cols = ['YOB']
+  # numeric_cols = ['YOB', 'votes']
 
   x_num = X[numeric_cols].as_matrix()
   x_max = np.amax(x_num, 0)
