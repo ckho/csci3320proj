@@ -415,12 +415,13 @@ def transform_for_svm_test(filename):
   X = df
 
   X = X.replace({False:-1, True:1})
+  X = X.drop('votes', 1)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
   X.loc[X.YOB.isnull(), 'YOB'] = 0
 
-  numeric_cols = ['YOB', 'votes']
+  numeric_cols = ['YOB']
 
   x_num = X[numeric_cols].as_matrix()
   x_max = np.amax(x_num, 0)
@@ -498,13 +499,14 @@ def transform_for_svm(filename):
   X = df.drop('Happy', 1)
   y = df['Happy']
 
+  X = X.drop('votes', 1)
   X = X.replace({False:-1, True:1})
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
   X.loc[X.YOB.isnull(), 'YOB'] = 0
 
-  numeric_cols = ['YOB', 'votes']
+  numeric_cols = ['YOB']
 
   x_num = X[numeric_cols].as_matrix()
   x_max = np.amax(x_num, 0)
@@ -604,6 +606,7 @@ def transform_for_rf(filename):
                                  'Own','Dad','Pessimist'],
                    na_values=['NA'])
   X = df.drop('Happy', 1)
+
   y = df['Happy']
 
   X = X.replace({False:-1, True:1})
