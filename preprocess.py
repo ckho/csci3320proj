@@ -63,7 +63,7 @@ def transform(filename):
   return {'data':data,'target':target}
 
 
-def transform_lg_test(filename):
+def transform_lr_test(filename):
   """ preprocess the training data"""
   """ your code here """
   df = pd.read_csv(filename,
@@ -121,7 +121,7 @@ def transform_lg_test(filename):
   X = df
 
   X = X.replace({False:-1, True:1})
-  X_filled = fill_missing(X.values,'mean',0)
+  X_filled = fill_missing(X.values,'most_frequent',0)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -147,7 +147,7 @@ def transform_lg_test(filename):
   return {'data':x_completed}
 
 
-def transform_for_lg(filename):
+def transform_for_lr(filename):
   """ preprocess the training data"""
   """ your code here """
   df = pd.read_csv(filename,
@@ -206,7 +206,7 @@ def transform_for_lg(filename):
   y = df['Happy']
   X = X.replace({False:-1, True:1})
 
-  X_filled = fill_missing(X.values,'mean',0)
+  X_filled = fill_missing(X.values,'most_frequent',0)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -542,7 +542,7 @@ def transform_for_rf_test(filename):
                                  'Own','Dad','Pessimist'],
                    na_values=['NA'])
   X = X.replace({False:-1, True:1})
-  X_filled = fill_missing(X.values,'medium',0)
+  X_filled = fill_missing(X.values,'medium',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -601,7 +601,7 @@ def transform_for_rf(filename):
   y = df['Happy']
 
   X = X.replace({False:-1, True:1})
-  X_filled = fill_missing(X.values,'medium',0)
+  X_filled = fill_missing(X.values,'medium',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -649,17 +649,14 @@ def fill_missing(X, strategy, isClassified):
       elif strategy == 'mean':
         replacement = np.nanmean(X[:,col])
       elif strategy == 'most_frequent':
-        replacement = sp.stats.mode(X[:,col], nan_policy='omit')
+        mode = sp.stats.mode(X[:,col], nan_policy='omit')
+        replacement = mode[0][0]
 
       for row in range(X[:,col].shape[0]):
         if np.isnan(X[row,col]):
           X[row,col] = replacement
 
   # if(isClassified):
-
-
-  print(X)
-
 
 
 
