@@ -97,7 +97,7 @@ def main():
   ## try voting classification
   lr_result = lr_model.predict(X_verify)
   nb_result = nb_model.predict(nb_X_verify)
-  svm_result = svm_model.predict(X_verify)
+  svm_result = svm_model.predict(svm_X_verify)
   rf_result = rf_model.predict(rf_X_verify)
 
   probability = [lr_accuracy, nb_accuracy, svm_accuracy, rf_accuracy]
