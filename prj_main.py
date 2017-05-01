@@ -191,6 +191,7 @@ def main():
       vote_predictions.append(random.choice([a, b, c, d], p=probability))
 
   vote_predictions_file = open(predictions_path + 'vote_predictions.csv', 'w')
+  print('UserID,Happy', file=vote_predictions_file)
   for x_test, prediction in zip(df.values, vote_predictions):
     print(str(int(x_test[0]))+','+str(int(prediction)), file=vote_predictions_file)
 
