@@ -1,151 +1,165 @@
-from preprocess import own_transform
-from preprocess import transform_for_test
+from preprocess import transform_for_general, transform_for_general_test
+from preprocess import transform_for_nb, transform_for_nb_test
+from preprocess import transform_for_rf, transform_for_rf_test
 from preprocess import fill_missing
 
 from lr import LogisticRegression
 from naive_bayes import NaiveBayes
 
-from sklearn.feature_extraction import DictVectorizer as DV
+from sklearn.feature_extraction import DictVectorizer
+from sklearn.preprocessing import OneHotEncoder
 from sklearn import svm
 from sklearn import ensemble
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression as lr2
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 
+from sklearn.model_selection import GridSearchCV
+
 import numpy as np
 import pandas as pd
+from numpy import random
 
 import time
 
 def main():
   # load training data
   filename_train = './data/train.csv'
-  train_dataset = own_transform(filename_train)
-  X = train_dataset['data']
-  y = train_dataset['target']
+  train_dataset = transform_for_general(filename_train)
 
-  X = X.replace({False:-1, True:1})
+  X_train, X_verify, y_train, y_verify = train_test_split(train_dataset['data'], train_dataset['target'], test_size=0.18, random_state=0)
 
-  X.loc[X.YOB < 1920, 'YOB'] = 0
-  X.loc[X.YOB > 2004, 'YOB'] = 0
-  X.loc[X.YOB.isnull(), 'YOB'] = 0
+  print(X_train.shape)
 
-  numeric_cols = ['YOB', 'votes']
-
-  x_num = X[numeric_cols].as_matrix()
-  x_max = np.amax(x_num, 0)
-  x_num = x_num / x_max
-
-  cat_X = X.drop(numeric_cols + ['UserID'], axis = 1)
-  cat_X.fillna(0, inplace = True)
-  x_cat = cat_X.T.to_dict().values()
-
-  # vectorize
-  vectorizer = DV(sparse = False)
-  vec_x_cat = vectorizer.fit_transform(x_cat)
-
-  # combine x
-  x_completed = np.hstack((x_num, vec_x_cat))
-
-
-  X_train, X_verify, y_train, y_verify = train_test_split(x_completed, y, test_size=0.18, random_state=0)
-
-  # ### use the logistic regression
+  ## use the logistic regression
   print('Train the logistic regression classifier')
   t1 = time.time()
   lr_model = LogisticRegression()
   lr_model.fit(X_train, y_train)
-  print(lr_model.score(X_verify, y_verify))
+  lr_accuracy = lr_model.score(X_verify, y_verify)
+  print('Accuracy: ' + str(lr_accuracy))
   print('Runtime: ' + str(time.time() - t1))
 
   print('Train the logistic regression classifier-sklearn')
   t1 = time.time()
   lr2_model = lr2()
   lr2_model.fit(X_train, y_train)
-  print(lr2_model.score(X_verify, y_verify))
+  lr2_accuracy = lr2_model.score(X_verify, y_verify)
+  print('Accuracy: ' + str(lr2_accuracy))
   print('Runtime: ' + str(time.time() - t1))
 
   ## use the naive bayes
-  print('Train the naive bayes classifier')
+  nb_train_dataset = transform_for_nb(filename_train)
+  nb_X_train, nb_X_verify, nb_y_train, nb_y_verify = train_test_split(nb_train_dataset['data'], nb_train_dataset['target'], test_size=0.18, random_state=0)
+
+  print('Train the naive bayes classifier-MultinomialNB')
   t1 = time.time()
-  nb_model = NaiveBayes(model='gaussian')
-  nb_model.fit(X_train, y_train)
-  print(nb_model.score(X_verify, y_verify))
+  nb_model = NaiveBayes(model='multinomial')
+  nb_model.fit(nb_X_train+1, nb_y_train)
+  nb_accuracy = nb_model.score(nb_X_verify, nb_y_verify)
+  print('Accuracy: ' + str(nb_accuracy))
   print('Runtime: ' + str(time.time() - t1))
 
-  print('Train the naive bayes classifier-sklearn')
+  print('Train the naive bayes classifier-sklearn-MultinomialNB')
   t1 = time.time()
-  nb2_model = GaussianNB()
-  nb2_model.fit(X_train, y_train)
-  print(nb2_model.score(X_verify, y_verify))
+  nb2_model = MultinomialNB()
+  nb2_model.fit(nb_X_train+1, nb_y_train)
+  nb2_accuracy = nb2_model.score(nb_X_verify, nb_y_verify)
+  print('Accuracy: ' + str(nb2_accuracy))
   print('Runtime: ' + str(time.time() - t1))
+
 
   ## use the svm
   print('Train the SVM classifier')
+  t1 = time.time()
   svm_model = svm.SVC(random_state=1, C=0.19, gamma=0.0028, shrinking=True, probability=True)
   svm_model.fit(X_train, y_train)
-  print(svm_model.score(X_verify, y_verify))
+  svm_accuracy = svm_model.score(X_verify, y_verify)
+  print('Accuracy: ' + str(svm_accuracy))
+  print('Runtime: ' + str(time.time() - t1))
 
   ## use the random forest
+  rf_train_dataset = transform_for_rf(filename_train)
+  rf_X_train, rf_X_verify, rf_y_train, rf_y_verify = train_test_split(rf_train_dataset['data'], rf_train_dataset['target'], test_size=0.18, random_state=0)
+
   print('Train the random forest classifier')
+  t1 = time.time()
   rf_model = ensemble.RandomForestClassifier(random_state=1, n_estimators=4300, n_jobs=-1)
-  rf_model.fit(X_train, y_train)
-  print(rf_model.score(X_verify, y_verify))
+  rf_model.fit(rf_X_train, rf_y_train)
+  rf_accuracy = rf_model.score(rf_X_verify, rf_y_verify)
+  print('Accuracy: ' + str(rf_accuracy))
+  print('Runtime: ' + str(time.time() - t1))
+
+
+  ## try voting classification
+  lr_result = lr_model.predict(X_verify)
+  nb_result = nb_model.predict(nb_X_verify)
+  svm_result = svm_model.predict(X_verify)
+  rf_result = rf_model.predict(rf_X_verify)
+
+  probability = [lr_accuracy, nb_accuracy, svm_accuracy, rf_accuracy]
+  probability = probability / sum(probability)
+
+  result = []
+  random.seed = 0
+  for a, b, c, d in zip(lr_result, nb_result, svm_result, rf_result):
+    count = 0
+    if a == 1:
+      count += 1
+    if b == 1:
+      count += 1
+    if c == 1:
+      count += 1
+    if d == 1:
+      count += 1
+    if count > 2:
+      result.append(1)
+    elif count < 2:
+      result.append(0)
+    else:
+      result.append(random.choice([a, b, c, d], p=probability))
+
+  accuracy = sum(result == y_verify) / len(y_verify)
+  print('Accuracy: ' + str(accuracy))
 
 
   ## get test data
   filename_test = './data/test.csv'
-  test_dataset = transform_for_test(filename_test)
+  df = pd.read_csv(filename_test)
+
+  test_dataset = transform_for_general_test(filename_test)
   X_test = test_dataset['data']
-
-  X_test = X_test.replace({False:-1, True:1})
-
-  X_test.loc[X_test.YOB < 1920, 'YOB'] = 0
-  X_test.loc[X_test.YOB > 2004, 'YOB'] = 0
-  X_test.loc[X_test.YOB.isnull(), 'YOB'] = 0
-
-  numeric_cols = ['YOB', 'votes']
-
-  x_test_num = X_test[numeric_cols].as_matrix()
-  x_test_num = x_test_num / x_max
-
-  cat_X_test = X_test.drop(numeric_cols + ['UserID'], axis = 1)
-  cat_X_test.fillna(0, inplace = True)
-  x_test_cat = cat_X_test.T.to_dict().values()
-
-  # vectorize
-  vec_x_test_cat = vectorizer.transform(x_test_cat)
-
-  # combine x
-  x_test_completed = np.hstack((x_test_num, vec_x_test_cat))
-
-  # # TO DO: Fill Missing
 
   predictions_path = './predictions/'
 
   ## do predictions
-  lr_predictions = lr_model.predict(x_test_completed)
+  lr_predictions = lr_model.predict(X_test)
   lr_predictions_file = open(predictions_path + 'lr_predictions.csv', 'w')
   print('UserID,Happy', file=lr_predictions_file)
-  for x_test, prediction in zip(X_test.values, lr_predictions):
+  for x_test, prediction in zip(df.values, lr_predictions):
     print(str(int(x_test[0]))+','+str(int(prediction)), file=lr_predictions_file)
 
-  nb_predictions = nb_model.predict(x_test_completed)
+
+  nb_test_dataset = transform_for_nb_test(filename_test)
+  X_nb_test = nb_test_dataset['data']
+  nb_predictions = nb_model.predict(X_nb_test)
   nb_predictions_file = open(predictions_path + 'nb_predictions.csv', 'w')
   print('UserID,Happy', file=nb_predictions_file)
-  for x_test, prediction in zip(X_test.values, nb_predictions):
+  for x_test, prediction in zip(df.values, nb_predictions):
     print(str(int(x_test[0]))+','+str(int(prediction)), file=nb_predictions_file)
 
-  svm_predictions = svm_model.predict(x_test_completed)
+  svm_predictions = svm_model.predict(X_test)
   svm_predictions_file = open(predictions_path + 'svm_predictions.csv', 'w')
   print('UserID,Happy', file=svm_predictions_file)
-  for x_test, prediction in zip(X_test.values, svm_predictions):
+  for x_test, prediction in zip(df.values, svm_predictions):
     print(str(int(x_test[0]))+','+str(int(prediction)), file=svm_predictions_file)
 
-  rf_predictions = rf_model.predict(x_test_completed)
+  rf_test_dataset = transform_for_rf_test(filename_test)
+  X_rf_test = rf_test_dataset['data']
+  rf_predictions = rf_model.predict(X_rf_test)
   rf_predictions_file = open(predictions_path + 'rf_predictions.csv', 'w')
   print('UserID,Happy', file=rf_predictions_file)
-  for x_test, prediction in zip(X_test.values, rf_predictions):
+  for x_test, prediction in zip(df.values, rf_predictions):
     print(str(int(x_test[0]))+','+str(int(prediction)), file=rf_predictions_file)
 
 #just testing git
