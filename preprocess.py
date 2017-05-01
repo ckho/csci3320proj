@@ -67,7 +67,7 @@ def transform(filename):
   return {'data':data,'target':target}
 
 
-def transform_lr_test(filename):
+def transform_for_lr_test(filename):
   """ preprocess the training data"""
   """ your code here """
   df = pd.read_csv(filename,
