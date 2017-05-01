@@ -25,37 +25,7 @@ import time
 def main():
   # load training data
   filename_train = './data/train.csv'
-<<<<<<< HEAD
-  train_dataset = own_transform(filename_train)
-  strategy = 'mean'
-  # strategy = 'medium'
-  # strategy = 'most_frequent'
-  train_dataset = fill_missing(train_dataset,strategy,0)
-  X = train_dataset['data']
-  y = train_dataset['target']
-
-  X = X.replace({False:-1, True:1})
-
-  X.loc[X.YOB < 1920, 'YOB'] = 0
-  X.loc[X.YOB > 2004, 'YOB'] = 0
-  X.loc[X.YOB.isnull(), 'YOB'] = 0
-
-  numeric_cols = ['YOB', 'votes']
-
-  x_num = X[numeric_cols].as_matrix()
-  x_max = np.amax(x_num, 0)
-  x_num = x_num / x_max
-
-  cat_X = X.drop(numeric_cols + ['UserID'], axis = 1)
-  cat_X.fillna(0, inplace = True)
-  x_cat = cat_X.T.to_dict().values()
-
-  # vectorize
-  vectorizer = DV(sparse = False)
-  vec_x_cat = vectorizer.fit_transform(x_cat)
-=======
   train_dataset = transform_for_general(filename_train)
->>>>>>> 894a154e639303e8a54a762069afc1c5e775f721
 
   X_train, X_verify, y_train, y_verify = train_test_split(train_dataset['data'], train_dataset['target'], test_size=0.18, random_state=0)
 

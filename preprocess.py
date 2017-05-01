@@ -199,10 +199,17 @@ def transform_for_general(filename):
   # df = df.replace({False:-1, True:1})
   # df = df.apply(pd.to_numeric, errors='ignore')
 
+
   X = df.drop('Happy', 1)
   y = df['Happy']
-
   X = X.replace({False:-1, True:1})
+
+  X_filled = fill_missing(X.values,'mean',0)
+
+  X = pd.DataFrame(data=X_filled, columns=X.columns)
+
+
+
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -368,6 +375,7 @@ def transform_for_rf_test(filename):
 
   cat_X = X.drop(numeric_cols + ['UserID'], axis = 1)
   cat_X.fillna(0, inplace = True)
+
   x_cat = cat_X.T.to_dict().values()
 
   # vectorize
@@ -449,10 +457,8 @@ def fill_missing(X, strategy, isClassified):
    otherwise, just take the median/mean/most_frequent values of input data to
    fill in the missing data
   """
-<<<<<<< HEAD
-  #
-  #strategy1: mean
-=======
+
+
   if not(isClassified):
     for col in range(X.shape[1]):
       replacement = 0
@@ -466,14 +472,14 @@ def fill_missing(X, strategy, isClassified):
       for row in range(X[:,col].shape[0]):
         if X[row,col] == 'nan':
           X[row,col] = replacement
->>>>>>> 894a154e639303e8a54a762069afc1c5e775f721
 
-  # print()
-  if strategy == 'mean':
-      X.mean()
+  # if(isClassified):
 
 
-  #strategy2: medium
-  #strategy3: mode
 
-  return X_full
+
+
+
+
+
+  return X
