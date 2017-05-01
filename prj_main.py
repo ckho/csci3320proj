@@ -1,4 +1,4 @@
-from preprocess import transform_for_general, transform_for_general_test
+from preprocess import transform_for_lr, transform_for_lr
 from preprocess import transform_for_svm, transform_for_svm_test
 from preprocess import transform_for_nb, transform_for_nb_test
 from preprocess import transform_for_rf, transform_for_rf_test
@@ -26,26 +26,23 @@ import time
 def main():
   # load training data
   filename_train = './data/train.csv'
-  train_dataset = transform_for_general(filename_train)
-
-  X_train, X_verify, y_train, y_verify = train_test_split(train_dataset['data'], train_dataset['target'], test_size=0.18, random_state=0)
-
-  print(X_train.shape)
 
   ## use the logistic regression
+  lr_train_dataset = transform_for_lr(filename_train)
+  lr_X_train, lr_X_verify, lr_y_train, lr_y_verify = train_test_split(lr_train_dataset['data'], lr_train_dataset['target'], test_size=0.18, random_state=0)
   print('Train the logistic regression classifier')
   t1 = time.time()
   lr_model = LogisticRegression()
-  lr_model.fit(X_train, y_train)
-  lr_accuracy = lr_model.score(X_verify, y_verify)
+  lr_model.fit(lr_X_train, lr_y_train)
+  lr_accuracy = lr_model.score(lr_X_verify, lr_y_verify)
   print('Accuracy: ' + str(lr_accuracy))
   print('Runtime: ' + str(time.time() - t1))
 
   print('Train the logistic regression classifier-sklearn')
   t1 = time.time()
   lr2_model = lr2()
-  lr2_model.fit(X_train, y_train)
-  lr2_accuracy = lr2_model.score(X_verify, y_verify)
+  lr2_model.fit(lr_X_train, lr_y_train)
+  lr2_accuracy = lr2_model.score(lr_X_verify, lr_y_verify)
   print('Accuracy: ' + str(lr2_accuracy))
   print('Runtime: ' + str(time.time() - t1))
 
@@ -95,7 +92,8 @@ def main():
 
 
   ## try voting classification
-  lr_result = lr_model.predict(X_verify)
+  print('Try voting classification by 4 classifiers')
+  lr_result = lr_model.predict(lr_X_verify)
   nb_result = nb_model.predict(nb_X_verify)
   svm_result = svm_model.predict(svm_X_verify)
   rf_result = rf_model.predict(rf_X_verify)
@@ -124,7 +122,7 @@ def main():
       # result.append(random.choice([a, b, c, d]))
       result.append(random.choice([a, b, c, d], p=probability))
 
-  accuracy = sum(result == y_verify) / len(y_verify)
+  accuracy = sum(result == lr_y_verify) / len(lr_y_verify)
   print('Accuracy: ' + str(accuracy))
 
 
@@ -132,13 +130,15 @@ def main():
   # filename_test = './data/test.csv'
   # df = pd.read_csv(filename_test)
 
-  # test_dataset = transform_for_general_test(filename_test)
-  # X_test = test_dataset['data']
+
 
   # predictions_path = './predictions/'
 
   # ## do predictions
-  # lr_predictions = lr_model.predict(X_test)
+
+  # lr_test_dataset = transform_for_lr_test(filename_test)
+  # X_lr_test = lr_test_dataset['data']
+  # lr_predictions = lr_model.predict(X_lr_test)
   # lr_predictions_file = open(predictions_path + 'lr_predictions.csv', 'w')
   # print('UserID,Happy', file=lr_predictions_file)
   # for x_test, prediction in zip(df.values, lr_predictions):
@@ -169,7 +169,7 @@ def main():
   # for x_test, prediction in zip(df.values, rf_predictions):
   #   print(str(int(x_test[0]))+','+str(int(prediction)), file=rf_predictions_file)
 
-#just testing git
+
 
 if __name__ == '__main__':
   main()

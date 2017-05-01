@@ -67,7 +67,7 @@ def transform(filename):
   return {'data':data,'target':target}
 
 
-def transform_for_general_test(filename):
+def transform_lr_test(filename):
   """ preprocess the training data"""
   """ your code here """
   df = pd.read_csv(filename,
@@ -152,7 +152,7 @@ def transform_for_general_test(filename):
   return {'data':x_completed}
 
 
-def transform_for_general(filename):
+def transform_for_lr(filename):
   """ preprocess the training data"""
   """ your code here """
   df = pd.read_csv(filename,
@@ -206,12 +206,20 @@ def transform_for_general(filename):
   # df = df.replace({False:-1, True:1})
   # df = df.apply(pd.to_numeric, errors='ignore')
 
+
   X = df.drop('Happy', 1)
   y = df['Happy']
 
   X = X[significant_field]
 
   X = X.replace({False:-1, True:1})
+
+  # X_filled = fill_missing(X.values,'mean',0)
+
+  # X = pd.DataFrame(data=X_filled, columns=X.columns)
+
+
+
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -555,6 +563,7 @@ def transform_for_rf_test(filename):
 
   cat_X = X.drop(numeric_cols + ['UserID'], axis = 1)
   cat_X.fillna(0, inplace = True)
+
   x_cat = cat_X.T.to_dict().values()
 
   # vectorize
@@ -636,6 +645,8 @@ def fill_missing(X, strategy, isClassified):
    otherwise, just take the median/mean/most_frequent values of input data to
    fill in the missing data
   """
+
+
   if not(isClassified):
     for col in range(X.shape[1]):
       replacement = 0
@@ -650,5 +661,13 @@ def fill_missing(X, strategy, isClassified):
         if X[row,col] == 'nan':
           X[row,col] = replacement
 
+  # if(isClassified):
 
-  return X_full
+
+
+
+
+
+
+
+  return X
