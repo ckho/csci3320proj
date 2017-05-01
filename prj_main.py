@@ -1,4 +1,5 @@
 from preprocess import transform_for_general, transform_for_general_test
+from preprocess import transform_for_svm, transform_for_svm_test
 from preprocess import transform_for_nb, transform_for_nb_test
 from preprocess import transform_for_rf, transform_for_rf_test
 from preprocess import fill_missing
@@ -70,11 +71,13 @@ def main():
 
 
   ## use the svm
+  svm_train_dataset = transform_for_svm(filename_train)
+  svm_X_train, svm_X_verify, svm_y_train, svm_y_verify = train_test_split(svm_train_dataset['data'], svm_train_dataset['target'], test_size=0.18, random_state=0)
   print('Train the SVM classifier')
   t1 = time.time()
   svm_model = svm.SVC(random_state=1, C=0.19, gamma=0.0028, shrinking=True, probability=True)
-  svm_model.fit(X_train, y_train)
-  svm_accuracy = svm_model.score(X_verify, y_verify)
+  svm_model.fit(svm_X_train, svm_y_train)
+  svm_accuracy = svm_model.score(svm_X_verify, svm_y_verify)
   print('Accuracy: ' + str(svm_accuracy))
   print('Runtime: ' + str(time.time() - t1))
 
@@ -99,68 +102,72 @@ def main():
 
   probability = [lr_accuracy, nb_accuracy, svm_accuracy, rf_accuracy]
   probability = probability / sum(probability)
+  print(probability*4)
 
   result = []
   random.seed = 0
   for a, b, c, d in zip(lr_result, nb_result, svm_result, rf_result):
     count = 0
     if a == 1:
-      count += 1
+      count += probability[0]*4
     if b == 1:
-      count += 1
+      count += probability[1]*4
     if c == 1:
-      count += 1
+      count += probability[2]*4
     if d == 1:
-      count += 1
+      count += probability[3]*4
     if count > 2:
       result.append(1)
     elif count < 2:
       result.append(0)
     else:
+      # result.append(random.choice([a, b, c, d]))
       result.append(random.choice([a, b, c, d], p=probability))
 
   accuracy = sum(result == y_verify) / len(y_verify)
   print('Accuracy: ' + str(accuracy))
 
 
-  ## get test data
-  filename_test = './data/test.csv'
-  df = pd.read_csv(filename_test)
+  # ## get test data
+  # filename_test = './data/test.csv'
+  # df = pd.read_csv(filename_test)
 
-  test_dataset = transform_for_general_test(filename_test)
-  X_test = test_dataset['data']
+  # test_dataset = transform_for_general_test(filename_test)
+  # X_test = test_dataset['data']
 
-  predictions_path = './predictions/'
+  # predictions_path = './predictions/'
 
-  ## do predictions
-  lr_predictions = lr_model.predict(X_test)
-  lr_predictions_file = open(predictions_path + 'lr_predictions.csv', 'w')
-  print('UserID,Happy', file=lr_predictions_file)
-  for x_test, prediction in zip(df.values, lr_predictions):
-    print(str(int(x_test[0]))+','+str(int(prediction)), file=lr_predictions_file)
+  # ## do predictions
+  # lr_predictions = lr_model.predict(X_test)
+  # lr_predictions_file = open(predictions_path + 'lr_predictions.csv', 'w')
+  # print('UserID,Happy', file=lr_predictions_file)
+  # for x_test, prediction in zip(df.values, lr_predictions):
+  #   print(str(int(x_test[0]))+','+str(int(prediction)), file=lr_predictions_file)
 
 
-  nb_test_dataset = transform_for_nb_test(filename_test)
-  X_nb_test = nb_test_dataset['data']
-  nb_predictions = nb_model.predict(X_nb_test)
-  nb_predictions_file = open(predictions_path + 'nb_predictions.csv', 'w')
-  print('UserID,Happy', file=nb_predictions_file)
-  for x_test, prediction in zip(df.values, nb_predictions):
-    print(str(int(x_test[0]))+','+str(int(prediction)), file=nb_predictions_file)
+  # nb_test_dataset = transform_for_nb_test(filename_test)
+  # X_nb_test = nb_test_dataset['data']
+  # nb_predictions = nb_model.predict(X_nb_test)
+  # nb_predictions_file = open(predictions_path + 'nb_predictions.csv', 'w')
+  # print('UserID,Happy', file=nb_predictions_file)
+  # for x_test, prediction in zip(df.values, nb_predictions):
+  #   print(str(int(x_test[0]))+','+str(int(prediction)), file=nb_predictions_file)
 
-  svm_predictions = svm_model.predict(X_test)
-  svm_predictions_file = open(predictions_path + 'svm_predictions.csv', 'w')
-  print('UserID,Happy', file=svm_predictions_file)
-  for x_test, prediction in zip(df.values, svm_predictions):
-    print(str(int(x_test[0]))+','+str(int(prediction)), file=svm_predictions_file)
+  # svm_test_dataset = transform_for_svm_test(filename_test)
+  # X_svm_test = svm_test_dataset['data']
+  # svm_predictions = svm_model.predict(X_svm_test)
+  # svm_predictions_file = open(predictions_path + 'svm_predictions.csv', 'w')
+  # print('UserID,Happy', file=svm_predictions_file)
+  # for x_test, prediction in zip(df.values, svm_predictions):
+  #   print(str(int(x_test[0]))+','+str(int(prediction)), file=svm_predictions_file)
 
-  rf_test_dataset = transform_for_rf_test(filename_test)
-  X_rf_test = rf_test_dataset['data']
-  rf_predictions = rf_model.predict(X_rf_test)
-  rf_predictions_file = open(predictions_path + 'rf_predictions.csv', 'w')
-  print('UserID,Happy', file=rf_predictions_file)
-  for x_test, prediction in zip(df.values, rf_predictions):
-    print(str(int(x_test[0]))+','+str(int(prediction)), file=rf_predictions_file)
+  # rf_test_dataset = transform_for_rf_test(filename_test)
+  # X_rf_test = rf_test_dataset['data']
+  # rf_predictions = rf_model.predict(X_rf_test)
+  # rf_predictions_file = open(predictions_path + 'rf_predictions.csv', 'w')
+  # print('UserID,Happy', file=rf_predictions_file)
+  # for x_test, prediction in zip(df.values, rf_predictions):
+  #   print(str(int(x_test[0]))+','+str(int(prediction)), file=rf_predictions_file)
 
 
 
