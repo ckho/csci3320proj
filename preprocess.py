@@ -270,8 +270,11 @@ def transform_for_nb_test(filename):
   X = X[significant_field]
 
   X = X.replace({False:-1, True:1})
+
+
   X_filled = fill_missing(X.values,'none',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
+  X['YOB'] = X['YOB'].astype(float)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
