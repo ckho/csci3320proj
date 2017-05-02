@@ -15,7 +15,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression as lr2
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 
+from sklearn.ensemble import GradientBoostingClassifier
+
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import cross_val_score
 
 import numpy as np
 import pandas as pd
@@ -46,10 +49,13 @@ def main():
   lr2_accuracy = lr2_model.score(lr_X_verify11, lr_y_verify11)
   print('Accuracy: ' + str(lr2_accuracy))
   print('Runtime: ' + str(time.time() - t1))
+  # scores = cross_val_score(lr2_model, lr_train_dataset['data'], lr_train_dataset['target'], cv=5)
+  # print('Cross-validation Score', scores)
+
 
   ## use the naive bayes
   nb_train_dataset = transform_for_nb(filename_train)
-  nb_X_train, nb_X_verify11, nb_y_train, nb_y_verify11 = train_test_split(nb_train_dataset['data'], nb_train_dataset['target'], test_size=0.02, random_state=20)
+  nb_X_train, nb_X_verify11, nb_y_train, nb_y_verify11 = train_test_split(nb_train_dataset['data'], nb_train_dataset['target'], test_size=0.05, random_state=20)
   nb_X_train11, nb_X_verify, nb_y_train11, nb_y_verify = train_test_split(nb_train_dataset['data'], nb_train_dataset['target'], test_size=0.18, random_state=0)
 
   print('Train the naive bayes classifier-MultinomialNB')
@@ -67,9 +73,10 @@ def main():
   nb2_accuracy = nb2_model.score(nb_X_verify11, nb_y_verify11)
   print('Accuracy: ' + str(nb2_accuracy))
   print('Runtime: ' + str(time.time() - t1))
+  # scores = cross_val_score(nb2_model, nb_train_dataset['data'], nb_train_dataset['target'], cv=5)
+  # print('Cross-validation Score', scores)
 
-
-  ## use the svm
+  # ## use the svm
   svm_train_dataset = transform_for_svm(filename_train)
   svm_X_train, svm_X_verify, svm_y_train, svm_y_verify = train_test_split(svm_train_dataset['data'], svm_train_dataset['target'], test_size=0.18, random_state=0)
   print('Train the SVM classifier')
@@ -79,6 +86,8 @@ def main():
   svm_accuracy = svm_model.score(svm_X_verify, svm_y_verify)
   print('Accuracy: ' + str(svm_accuracy))
   print('Runtime: ' + str(time.time() - t1))
+  # scores = cross_val_score(svm_model, svm_train_dataset['data'], svm_train_dataset['target'], cv=5)
+  # print('Cross-validation Score', scores)
 
   ## use the random forest
   rf_train_dataset = transform_for_rf(filename_train)
@@ -91,7 +100,8 @@ def main():
   rf_accuracy = rf_model.score(rf_X_verify, rf_y_verify)
   print('Accuracy: ' + str(rf_accuracy))
   print('Runtime: ' + str(time.time() - t1))
-
+  # scores = cross_val_score(rf_model, rf_train_dataset['data'], rf_train_dataset['target'], cv=5)
+  # print('Cross-validation Score', scores)
 
   ## try voting classification
   print('Try voting classification by 4 classifiers')
