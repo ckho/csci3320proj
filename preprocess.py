@@ -123,11 +123,10 @@ def transform_for_lr_test(filename):
   # df = df.apply(pd.to_numeric, errors='ignore')
 
   X = df
-
   X = X[significant_field]
 
   X = X.replace({False:-1, True:1})
-  X_filled = fill_missing(X.values,'most_frequent',1)
+  X_filled = fill_missing(X,'most_frequent',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -215,8 +214,8 @@ def transform_for_lr(filename):
   X = X[significant_field]
 
   X = X.replace({False:-1, True:1})
-
-  X_filled = fill_missing(X.values,'most_frequent',1)
+  # X_filled = fill_missing(X.values,'most_frequent',0)
+  X_filled= fill_missing(X,'most_frequent',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -266,15 +265,27 @@ def transform_for_nb_test(filename):
                                  'Space','In-person','Grrr people',
                                  'Own','Dad','Pessimist'],
                    na_values=['NA'])
+  X['HouseholdStatus'] = X['HouseholdStatus'].map({'Single (no kids)':1,
+                                                    'Single (w/kids)':2,
+                                                    'Domestic Partners (no kids)':3,
+                                                    'Domestic Partners (w/kids)':4,
+                                                    'Married (no kids)':5,
+                                                    'Married (w/kids)':6})
+  X['EducationLevel'] = X['EducationLevel'].map({'Current K-12':1,
+                                                  'High School Diploma':2,
+                                                  "Associate's Degree":3,
+                                                  'Current Undergraduate':4,
+                                                  "Bachelor's Degree":5,
+                                                  "Master's Degree":6,
+                                                  'Doctoral Degree':7})
 
   X = X[significant_field]
 
   X = X.replace({False:-1, True:1})
 
-
-  X_filled = fill_missing(X.values,'none',1)
+  # X_filled = fill_missing(X.values,'mean',0)
+  X_filled = fill_missing(X,'mean',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
-  X['YOB'] = X['YOB'].astype(float)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
   X.loc[X.YOB > 2004, 'YOB'] = 0
@@ -325,14 +336,27 @@ def transform_for_nb(filename):
                                  'Space','In-person','Grrr people',
                                  'Own','Dad','Pessimist'],
                    na_values=['NA'])
+  df['HouseholdStatus'] = df['HouseholdStatus'].map({'Single (no kids)':1,
+                                                     'Single (w/kids)':2,
+                                                     'Domestic Partners (no kids)':3,
+                                                     'Domestic Partners (w/kids)':4,
+                                                     'Married (no kids)':5,
+                                                     'Married (w/kids)':6})
+  df['EducationLevel'] = df['EducationLevel'].map({'Current K-12':1,
+                                                   'High School Diploma':2,
+                                                   "Associate's Degree":3,
+                                                   'Current Undergraduate':4,
+                                                   "Bachelor's Degree":5,
+                                                   "Master's Degree":6,
+                                                   'Doctoral Degree':7})
   X = df.drop('Happy', 1)
   y = df['Happy']
 
   X = X[significant_field]
 
   X = X.replace({False:-1, True:1})
-
-  X_filled = fill_missing(X.values,'mean',1)
+  # X_filled = fill_missing(X.values,'mean',0)
+  X_filled = fill_missing(X,'mean',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X['YOB'] = X['YOB'].astype(float)
@@ -423,7 +447,7 @@ def transform_for_svm_test(filename):
   X = df
 
   X = X.replace({False:-1, True:1})
-  X_filled = fill_missing(X.values,'none',1)
+  X_filled = fill_missing(X,'mean',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X = X.drop('votes', 1)
@@ -512,7 +536,7 @@ def transform_for_svm(filename):
 
   X = X.drop('votes', 1)
   X = X.replace({False:-1, True:1})
-  X_filled = fill_missing(X.values,'most_frequent',1)
+  X_filled = fill_missing(X,'most_frequent',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -564,8 +588,21 @@ def transform_for_rf_test(filename):
                                  'Space','In-person','Grrr people',
                                  'Own','Dad','Pessimist'],
                    na_values=['NA'])
+  X['HouseholdStatus'] = X['HouseholdStatus'].map({'Single (no kids)':1,
+                                                     'Single (w/kids)':2,
+                                                     'Domestic Partners (no kids)':3,
+                                                     'Domestic Partners (w/kids)':4,
+                                                     'Married (no kids)':5,
+                                                     'Married (w/kids)':6})
+  X['EducationLevel'] = X['EducationLevel'].map({'Current K-12':1,
+                                                   'High School Diploma':2,
+                                                   "Associate's Degree":3,
+                                                   'Current Undergraduate':4,
+                                                   "Bachelor's Degree":5,
+                                                   "Master's Degree":6,
+                                                   'Doctoral Degree':7})
   X = X.replace({False:-1, True:1})
-  X_filled = fill_missing(X.values,'medium',1)
+  X_filled = fill_missing(X,'medium',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -620,12 +657,25 @@ def transform_for_rf(filename):
                                  'Space','In-person','Grrr people',
                                  'Own','Dad','Pessimist'],
                    na_values=['NA'])
+  df['HouseholdStatus'] = df['HouseholdStatus'].map({'Single (no kids)':1,
+                                                     'Single (w/kids)':2,
+                                                     'Domestic Partners (no kids)':3,
+                                                     'Domestic Partners (w/kids)':4,
+                                                     'Married (no kids)':5,
+                                                     'Married (w/kids)':6})
+  df['EducationLevel'] = df['EducationLevel'].map({'Current K-12':1,
+                                                   'High School Diploma':2,
+                                                   "Associate's Degree":3,
+                                                   'Current Undergraduate':4,
+                                                   "Bachelor's Degree":5,
+                                                   "Master's Degree":6,
+                                                   'Doctoral Degree':7})
   X = df.drop('Happy', 1)
 
   y = df['Happy']
 
   X = X.replace({False:-1, True:1})
-  X_filled = fill_missing(X.values,'medium',1)
+  X_filled = fill_missing(X,'medium',1)
   X = pd.DataFrame(data=X_filled, columns=X.columns)
 
   X.loc[X.YOB < 1920, 'YOB'] = 0
@@ -665,24 +715,113 @@ def fill_missing(X, strategy, isClassified):
    otherwise, just take the median/mean/most_frequent values of input data to
    fill in the missing data
   """
+
+  X_fill = X.values
+  X['HouseholdStatus'] = X['HouseholdStatus'].astype(float)
+
   if not(isClassified):
-    for col in range(X.shape[1]):
+
+    for col in range(X_fill.shape[1]):
       replacement = 0
       if strategy == 'median':
-        replacement = np.nanmedian(X[:,col])
+        replacement = np.nanmedian(X_fill[:,col])
       elif strategy == 'mean':
-        replacement = np.nanmean(X[:,col])
+        replacement = np.nanmean(X_fill[:,col])
       elif strategy == 'most_frequent':
-        mode = sp.stats.mode(X[:,col], nan_policy='omit')
+        mode = sp.stats.mode(X_fill[:,col], nan_policy='omit')
         replacement = mode[0][0]
 
-      for row in range(X[:,col].shape[0]):
-        if np.isnan(X[row,col]):
-          X[row,col] = replacement
+      for row in range(X_fill.shape[0]):
+        if np.isnan(X_fill[row,col]):
+          X_fill[row,col] = replacement
 
-  # if(isClassified):
+  # print(X['YOB'].isnull().sum())#2 553
+  # print(X['Gender'].isnull().sum())#1 434
+  # print(X['Income'].isnull().sum())#6 973
+  # print(X['HouseholdStatus'].isnull().sum())#4 650
+  # print(X['EducationLevel'].isnull().sum())#5 878
+  # print(X['Party'].isnull().sum())#3 581
+
+  #decision tree:
+
+    #Gender -> YOB -> Party -> HouseholdStatus -> EducationLevel -> Income
+    #YOB -> HouseholdStatus -> EducationLevel -> Income
+    #1900-2011     1-6             1-7             1-6
+
+  if(isClassified):
+
+     yob = X.columns.get_loc("YOB")
+     house = X.columns.get_loc("HouseholdStatus")
+     educate = X.columns.get_loc("EducationLevel")
+     income = X.columns.get_loc("Income")
+
+     YOB_mean = np.nanmean(X.YOB[:])
+     YOB_medium = np.nanmedian(X.YOB[:])
+     YOB_mode = sp.stats.mode(X.YOB[:], nan_policy='omit')[0][0]
+    #  print(YOB_mean)1979.04646722
+    #  print(YOB_mode)1996.0
+    #  print(YOB_medium)1982.0
+
+    #first layer filling
+     YOB1,YOB2=[],[]
+     House11, House12, House13, House14, House15, House16 = [],[],[],[],[],[]
+
+     tree1,tree2=0,0
+     for row in range(X.shape[0]):
+
+         if X.YOB[row]>YOB_mean:
+             tree1=1
+             YOB1.append(X.HouseholdStatus[row])
+
+         elif X.YOB[row]<=YOB_mean:
+             tree1=2
+             YOB2.append(X.HouseholdStatus[row])
+
+         elif np.isnan(X.YOB[row]):
+             tmp=np.random.randint(1,3)
+             if tmp ==1: X_fill[row][yob]=YOB_mean
+             if tmp ==2: X_fill[row][yob]=YOB_medium
+             if tmp ==3: X_fill[row][yob]=YOB_mode
 
 
 
+     for row in range(X.shape[0]):
+        if tree1 == 1:
+            if X.HouseholdStatus[row] == 1:
+                House11.append(X.HouseholdStatus[row])
+            elif X.HouseholdStatus[row] == 2:
+                House12.append(X.HouseholdStatus[row])
+            elif X.HouseholdStatus[row] == 3:
+                House13.append(X.HouseholdStatus[row])
+            elif X.HouseholdStatus[row] == 4:
+                House14.append(X.HouseholdStatus[row])
+            elif X.HouseholdStatus[row] == 5:
+                House15.append(X.HouseholdStatus[row])
+            elif X.HouseholdStatus[row] == 6:
+                House16.append(X.HouseholdStatus[row])
+            elif np.isnan(X.HouseholdStatus[row]):
+                X_fill[row][house]=np.nanmean(YOB1[:])
+                # X_fill[row][house]=np.nanmedian(YOB1[:])
+                # X_fill[row][house]=sp.stats.mode(YOB1[:], nan_policy='omit')[0][0]
 
-  return X
+        if tree1 == 2:
+             if X.HouseholdStatus[row] == 1:
+                 House11.append(X.HouseholdStatus[row])
+             elif X.HouseholdStatus[row] == 2:
+                 House12.append(X.HouseholdStatus[row])
+             elif X.HouseholdStatus[row] == 3:
+                 House13.append(X.HouseholdStatus[row])
+             elif X.HouseholdStatus[row] == 4:
+                 House14.append(X.HouseholdStatus[row])
+             elif X.HouseholdStatus[row] == 5:
+                 House15.append(X.HouseholdStatus[row])
+             elif X.HouseholdStatus[row] == 6:
+                 House16.append(X.HouseholdStatus[row])
+             elif np.isnan(X.HouseholdStatus[row]):
+                X_fill[row][house]=np.nanmean(YOB1[:])
+                # X_fill[row][house]=np.nanmedian(YOB1[:])
+                # X_fill[row][house]=sp.stats.mode(YOB1[:], nan_policy='omit')[0][0]
+
+
+
+  return X_fill
